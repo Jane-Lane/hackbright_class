@@ -23,6 +23,8 @@ def new_list(cart, key, items):
         return cart
     items = list(set(items))
     items.sort()
+    for i in range(len(items)):
+        items[i]=items[i].strip()
     cart[key]=items
     return cart
 
@@ -40,6 +42,15 @@ def remove_list(cart, key):
     del cart[key]
     return cart
 
+def add_multiple_items(cart, key, comma_string):
+    items = comma_string.split(",")
+    for item in items:
+        item = item.strip()
+        new_item(cart, key, item)
+    return cart
+
+
+
 
 
 def main():
@@ -51,10 +62,11 @@ def main():
 4 - Add an item to a shopping list.
 5 - Remove an item from a shopping list.
 6 - Remove a list by nickname.
-7 - Exit when you are done.''' 
+7 - Add multiple items to a shopping list.
+8 - Exit when you are done.''' 
     print menu
     while(True):
-        call = raw_input("Enter a number 0 through 7: ").strip()
+        call = raw_input("Enter a number 0 through 8: ").strip()
         if call == '0':
             print menu
         if call == '1':
@@ -64,7 +76,7 @@ def main():
             show_the_list(shopping,key)
         elif call == '3':
             key = raw_input("What would you like to name the list? ").strip()
-            items = raw_input("Add items to the list (separate with spaces): ").split()
+            items = raw_input("Add items to the list (separate with commas): ").split(",")
             shopping = new_list(shopping, key, items)
         elif call == '4':
             key = raw_input("Which list would you like?").strip()
@@ -78,6 +90,11 @@ def main():
             key = raw_input("Which list would you like to remove?")
             shopping = remove_list(shopping, key)
         elif call == '7':
+            key = raw_input("Which list would you like?").strip()
+            comma_string = raw_input("List items, separated by commas:").strip()
+            shopping = add_multiple_items(shopping, key, comma_string)
+
+        elif call == '8':
             break
         else:
             print menu

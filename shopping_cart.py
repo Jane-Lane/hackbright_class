@@ -49,6 +49,14 @@ def add_multiple_items(cart, key, comma_string):
         new_item(cart, key, item)
     return cart
 
+def save_into(cart, key, file_name):
+    with open(file_name, 'w') as outfile:
+        outfile.write(key)
+        outfile.write(":\t")
+        for item in cart[key]:
+            outfile.write(item)
+            outfile.write(",")
+    
 
 
 
@@ -63,7 +71,8 @@ def main():
 5 - Remove an item from a shopping list.
 6 - Remove a list by nickname.
 7 - Add multiple items to a shopping list.
-8 - Exit when you are done.''' 
+8 - Export your shopping list to a file.
+9 - Exit when you are done.''' 
     print menu
     while(True):
         call = raw_input("Enter a number 0 through 8: ").strip()
@@ -93,8 +102,11 @@ def main():
             key = raw_input("Which list would you like?").strip()
             comma_string = raw_input("List items, separated by commas:").strip()
             shopping = add_multiple_items(shopping, key, comma_string)
-
         elif call == '8':
+            file_name = raw_input("Enter the name of the file: ").strip()
+            key = raw_input("Which shopping list would you like to export? ").strip()
+            save_into(shopping, key, file_name)
+        elif call == '9':
             break
         else:
             print menu

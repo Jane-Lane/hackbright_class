@@ -1,1 +1,13 @@
 My goal is to turn ISBN numbers into a library catalogue.  If I were really ambitious I would want a script to take an ISBN number, look it up on the Library of Congress site, take their MARC file or whatever data format they had, reformat that data into a catalogue, and write a UI for someone to search the catalogue and/or a UI for a librarian to add one or more ISBN numbers.  As my advisor told me, I could just do parts of that project, but I'm definitely excited about attempting it.  So that's what I have so far.
+
+Plan for catalogue:
+The catalogue should be a dictionary with ISBN numbers as keys, loaded from a file.  Data should include number of copies, and perhaps a path to a file containing the doc's description, or a data structure that contains catalogue information.  This part I will do last after I decide how much of the rest I can do.
+
+Plan for user interface:
+Catalogue entries will include keywords, as well as author and title information.  These should be searchable by a user; currently, the way I know how to do that would be to put a list (or set) of ISBN numbers as the value in yet another dictionary, under each keyword.
+
+Plan for turning ISBN numbers into data:
+Learn to use the API at the Library of Congress website.
+Either look up code to process MARC files into a data type I can use (most likely a dictionary for each ISBN, I know I'm overusing dictionaries but don't have better advice) or write my own.
+
+I don't have pseudocode yet because I just decided on my project on Monday.  Also, while I've used modules before we haven't covered them in class yet, how are we supposed to document which ones we are going to use?

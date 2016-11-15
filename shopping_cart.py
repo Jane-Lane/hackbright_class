@@ -6,7 +6,6 @@ def example():
     return shopping
 
 
-
 def show_all_lists(cart):
     for key, value in cart.items():
         print key, value
@@ -14,8 +13,11 @@ def show_all_lists(cart):
 def show_the_list(cart,key):
     if key not in cart:
         print "List does not exist"
+    elif len(cart[key]) == 0:
+        print "List is empty."
     else:
-        print cart[key]
+        for item in cart[key]:
+            print item
 
 def new_list(cart, key, items):
     if key in cart:
@@ -49,20 +51,36 @@ def add_multiple_items(cart, key, comma_string):
         new_item(cart, key, item)
     return cart
 
-def save_into(cart, key, file_name):
+def save_into(cart, file_name):
     with open(file_name, 'w') as outfile:
-        outfile.write(key)
-        outfile.write(":\t")
-        for item in cart[key]:
-            outfile.write(item)
-            outfile.write(",")
-    
-
-
-
+        outfile.write(str(cart))
 
 def main():
-    shopping=example()
+    #shopping=example() Used this before having a file
+    shopping = {}
+    try:
+        cart_file = open("cart.txt", 'r')
+        format_type = raw_input('''Enter 1 if the contents are a dictionary,
+2 if the format is List: item, item, item ''')
+        if format_type == '1':
+            shopping = eval(cart_file.read())
+        elif format_type == '2':
+            for line in cart_file:
+                line = line.strip()
+                if line != '':
+                    parts = line.split(":")
+                    key = parts[0].strip()
+                    value = parts[1].split(",")
+                    for i in range(len(value)):
+                        value[i] = value[i].strip()
+                    shopping[key] = value
+        else:
+            print "Okay, starting with empty cart."
+        cart_file.close()
+    except IOError:  #This try/except makes the code not fail on that specific error.
+        print "No file named cart.txt, beginning with empty cart."
+    
+        
     menu = '''0 - Main Menu
 1 - Show all lists.
 2 - Show a specific list.
@@ -71,11 +89,12 @@ def main():
 5 - Remove an item from a shopping list.
 6 - Remove a list by nickname.
 7 - Add multiple items to a shopping list.
-8 - Export your shopping list to a file.
-9 - Exit when you are done.''' 
+8 - Export all your shopping lists to the standard file.
+9 - Export all your shopping lists to a different file.
+10 - Exit when you are done.''' 
     print menu
     while(True):
-        call = raw_input("Enter a number 0 through 8: ").strip()
+        call = raw_input("Enter a number 0 through 10: ").strip()
         if call == '0':
             print menu
         if call == '1':
@@ -103,10 +122,12 @@ def main():
             comma_string = raw_input("List items, separated by commas:").strip()
             shopping = add_multiple_items(shopping, key, comma_string)
         elif call == '8':
-            file_name = raw_input("Enter the name of the file: ").strip()
-            key = raw_input("Which shopping list would you like to export? ").strip()
-            save_into(shopping, key, file_name)
+            file_name = "cart.txt"
+            save_into(shopping, file_name)
         elif call == '9':
+            file_name = raw_input("Name the file: ").strip()
+            save_into(shopping, file_name)
+        elif call == '10':
             break
         else:
             print menu

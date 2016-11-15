@@ -1,1 +1,1 @@
-{'Safeway': ['butter', 'cake', 'cookies', 'milk'], 'Target': ['detergent', 'soap', 'socks', 'sponges']}
+{'Safeway': ['broccoli', 'pasta', 'cookies'], 'Target': ['peanut butter', 'jelly', 'bread', 'air mattress'], 'Costco': ['milk', 'chicken stock']}

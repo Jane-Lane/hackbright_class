@@ -1,0 +1,1 @@
+Currently an unorganized list of class assignments.  Cart.txt is used by shopping_cart.py. Project.txt will likely later be moved into its own folder.

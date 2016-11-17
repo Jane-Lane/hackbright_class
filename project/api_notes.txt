@@ -1,0 +1,122 @@
+https://openlibrary.org/dev/docs/api/books
+
+Wikipedia claims this project has the goal of “one web page per book” and gets its data from many websites including the Library of Congress.  The above API page looks promising.
+
+“Optional parameter which specifies the response format. Possible values are json and javascript. The default format is javascript.“
+
+e.g. 'https://openlibrary.org/api/books?bibkeys=ISBN:0201558025,LCCN:93005405&format=json'
+
+Data below looks like too much!  Ask Mom how much she really needs.
+
+When the jscmd=data, data about each matching book is returned. It includes the following:
+
+url
+
+URL of the book
+
+title and subtitle
+
+Title and subtitle of the book.
+
+authors
+
+List of authors. Each entry will be in the following format:
+
+{
+    "name": "...",
+    "url": "https://openlibrary.org/authors/..."
+}
+
+identifiers
+
+All identifiers of the book in the following format:
+
+{
+    "isbn_10": [...],
+    "isbn_13": [...],
+    "lccn": [...],
+    "oclc": [...],
+    "goodreads": [...]
+}
+
+classifications
+
+All classifications of the book in the following format.
+
+{
+    "lc_classifications": [...],
+    "dewey_decimal_class": [...]
+}
+
+subjects, subject_places, subject_people and subject_times
+
+List of subjects, places, people and times of the book. Each entry will be in the following format:
+
+{
+    "url": "https://openlibrary.org/subjects/history",
+    "name": "History"
+}
+
+publishers
+
+List of publishers. Each publisher will be in the following format:
+
+{
+    "name": "..."
+}
+
+publish_places
+
+List of publish places. Each entry will be in the following format:
+
+{
+    "name": "..."
+}
+
+publish_date
+
+Published date as a string.
+
+excerpts
+
+List of excerpts to that book. Each entry will be in the following format:
+
+{
+    "comment": "...",
+    "text": "..."
+}
+
+links
+
+List of links to the book. Each link will be in the following format:
+
+{
+    "url": "https://...",
+    "title": "..."
+}
+
+cover
+
+URLs to small, medium and large covers.
+
+{
+    "small": "https://covers.openlibrary.org/b/id/1-S.jpg",
+    "medium": "https://covers.openlibrary.org/b/id/1-M.jpg",
+    "large": "https://covers.openlibrary.org/b/id/1-L.jpg",
+}
+
+ebooks
+
+List of ebooks. Each entry will be in the following format:
+
+{
+    "preview_url": "https://archive.org/details/..."
+}
+
+number_of_pages
+
+Number of pages in that book.
+
+weight
+
+Weight of the book.

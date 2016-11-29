@@ -1,0 +1,8 @@
+Mystery:0 1 
+Young women:0 1 
+Vampires:0 1 
+Fiction:0 1 
+Mystery:5 
+Young women:5 
+Vampires:5 
+Fiction:5 

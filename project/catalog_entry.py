@@ -3,8 +3,9 @@ def strip_isbn(isbn): #takes out non-numeric characters
     isbn = ''.join(digits)
     return isbn
 
-class CatalogEntry(object):
-    def __init__(self, isbn, title='', author=''):
+class Record(object):
+    def __init__(self, library_id = '', isbn = '', title='', author=''):
+        self.library_id = library_id
         isbn = strip_isbn(isbn)
         self.isbn_10 = ''
         self.isbn_13 = ''
@@ -21,10 +22,30 @@ class CatalogEntry(object):
         self.publisher = ''
         self.all_authors = []
         self.subjects = []
+        self.keywords=[]
         self.all_publishers = []
         self.lccn = ''
-        self.isbn_13 = self.isbn
-        self.copies = 1
+    def __repr__(self):
+        s = '''
+Title: %s
+Author: %s
+Publisher: %s
+ISBN 10: %s
+ISBN 13: %s
+Library ID: %s
+'''%(self.title, self.author, self.publisher, self.isbn_10, self.isbn_13, self.library_id)
+        return s
+
+    def __eq__(self, other):
+        if self.library_id == other.library_id:
+            return True
+        else:
+            return False
+
+class CatalogEntry(Record):
+    def __init__(self, isbn, copies = 1, title='', author=''):
+        Record.__init__(self, '', isbn, title, author)
+        self.copies = copies
         
     def __repr__(self): #Method of displaying/printing/stringifying an object.
         s = '''

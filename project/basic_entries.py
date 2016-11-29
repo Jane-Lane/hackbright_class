@@ -2,6 +2,8 @@ from catalog_entry import CatalogEntry
 from api_attempts import get_info
 from api_attempts import raw_info
 
+import searching_dictionary
+
 file_check = raw_input("I expect a file called isbn.txt. Is there one? Y/N").strip().lower()
 books = []
 if file_check[0] == 'y':
@@ -12,13 +14,7 @@ if file_check[0] == 'y':
                 book = get_info(isbn)
                 if book is not None:
                     print 'Adding to catalogue: %s by %s' %(book.title, book.author)
-                    if book in books:
-                        index = books.index(book) #need to write a function to do this
-                        book = books[index]
-                        book.copies += 1
-                        books[index] = book
-                    else:
-                        books.append(book)
+                    books.append(book)
         
 else:
     entry = raw_input("Press 1 to enter an ISBN, 2 to name another file, anything else to exit:")
@@ -33,14 +29,57 @@ else:
                     book = get_info(isbn)
                     if book is not None:
                         print 'Adding to catalogue:', book
-                        if book in books:
-                            index = books.index(book)
-                            book = books[index]
-                            book.copies += 1
-                            books[index] = book
-                        else:
-                            books.append(book)
+                        books.append(book)
 
-with open("catalogue.txt", 'a') as catalog:
-    for book in books:
-        catalog.write(str(book))
+
+used_ids = []
+with open("id_index.txt", 'r') as file:
+    for line in file:
+        used_ids.append(int(line))
+
+last = max(used_ids)
+recycle_ids = [x for x in range(last) if x not in used_ids]
+new_ids = []
+for i in range(len(books)):
+    if i < len(recycle_ids):
+        new_ids.append(recycle_ids[i])
+    else:
+        new_ids.append(i + last + 1 - len(recycle_ids))
+
+all_ids = used_ids + new_ids
+if len(all_ids) > 0:
+    all_ids.sort()
+
+with open("id_index.txt", 'w') as file:
+    for num in all_ids:
+        file.write(str(num))
+        file.write("\n")
+
+keywords = {}
+titles = {}
+authors = {}
+for i in range(len(new_ids)):
+    id_num = str(new_ids[i])
+    books[i].library_id = id_num
+    author = books[i].author
+    title = books[i].title
+    keys = books[i].keywords
+    if author not in authors:
+        authors[author] = []
+    authors[author].append(id_num)
+    if title not in titles:
+        titles[title] = []
+    titles[title].append(id_num)
+    for word in keys:
+        if word not in keywords:
+            keywords[word] = []
+        keywords[word].append(id_num)
+
+searching_dictionary.add_authors(authors)
+searching_dictionary.add_titles(titles)
+searching_dictionary.add_keywords(keywords)
+
+for book in books:
+    file_name = book.library_id+".txt"
+    with open(file_name, 'w') as file:
+        file.write(str(book))

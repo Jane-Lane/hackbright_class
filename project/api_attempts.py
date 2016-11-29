@@ -1,7 +1,7 @@
 #-*- coding: UTF-8 -*-
 from urllib2 import urlopen
 import json
-from catalog_entry import CatalogEntry
+from catalog_entry import Record
 
 def example_isbns():
     examples = {}
@@ -54,7 +54,8 @@ def get_info(isbn):
         print "No subjects found"
     if 'publishers' in data:
         publishers = [x['name'].encode('utf-8') for x in data['publishers']]
-    ret = CatalogEntry(isbn, title=title, author=author)
+    ret = Record(isbn, title=title, author=author)
     ret.publisher = publishers[0]
     ret.all_authors = [x['name'].encode('utf-8') for x in data['authors']]
+    ret.keywords = subjects
     return ret

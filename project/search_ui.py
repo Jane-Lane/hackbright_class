@@ -3,16 +3,18 @@ from catalog_display import display
 
 def search_by_author(query):
     authors = searching_dictionary.read_authors()
+    results = []
     if query in authors:
-        results = authors[query]
+        results.extend(authors[query])
         for num in results:
             display(num)
 
 def search_by_title(query):
     titles = searching_dictionary.read_titles()
+    results = []
     for key in titles:
-        if query in key:
-            results = titles[key]
+        if query.lower() in key.lower() or query == key:
+            results.extend(titles[key])
             for num in results:
                 display(num)
         '''elif set(query.split())|set(key.split())==set(key.split()):

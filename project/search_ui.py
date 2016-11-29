@@ -1,5 +1,9 @@
 import searching_dictionary
-from catalog_display import display
+from basic_entries import PATH
+
+def display(id_number):
+    with open(PATH+id_number+".txt", 'r') as file:
+        print file.read()
 
 def search_by_author(query):
     authors = searching_dictionary.read_authors()

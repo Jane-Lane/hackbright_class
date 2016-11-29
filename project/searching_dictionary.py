@@ -1,6 +1,5 @@
 '''This file reads from keywords.txt, authors.txt, titles.txt
 '''
-
 def read_keywords():
     keywords = {}
     with open("keywords.txt", 'r') as file:

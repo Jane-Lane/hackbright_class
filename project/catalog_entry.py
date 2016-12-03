@@ -4,9 +4,9 @@ def strip_isbn(isbn): #takes out non-numeric characters
     return isbn
 
 class Record(object):
-    def __init__(self, library_id = '', isbn = '', title='', author=''):
+    def __init__(self, library_id = '', ISBN = '', title='', author=''):
         self.library_id = library_id
-        isbn = strip_isbn(isbn)
+        isbn = strip_isbn(ISBN)
         self.isbn_10 = ''
         self.isbn_13 = ''
         if len(isbn) == 13:

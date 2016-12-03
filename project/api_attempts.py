@@ -50,11 +50,11 @@ def get_info(isbn):
         for x in data['subjects']:
             if 'DAISY' not in x['name'] and x['name']!= 'OverDrive':
                 subjects.append(x['name'].encode('utf-8'))
-    else:
-        print "No subjects found"
+    #else:
+    #    print "No subjects found"
     if 'publishers' in data:
         publishers = [x['name'].encode('utf-8') for x in data['publishers']]
-    ret = Record(isbn, title=title, author=author)
+    ret = Record(ISBN=isbn, title=title, author=author)
     ret.publisher = publishers[0]
     ret.all_authors = [x['name'].encode('utf-8') for x in data['authors']]
     ret.keywords = subjects

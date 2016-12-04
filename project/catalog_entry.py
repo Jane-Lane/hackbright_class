@@ -7,14 +7,18 @@ class Record(object):
     def __init__(self, library_id = '', ISBN = '', title='', author=''):
         self.library_id = library_id
         isbn = strip_isbn(ISBN)
-        self.isbn_10 = ''
-        self.isbn_13 = ''
         if len(isbn) == 13:
             self.isbn_13 = isbn
             self.isbn = isbn
+            self.isbn_10 = isbn[3:]
         elif len(isbn) == 10:
             self.isbn_10 = isbn
-            self.isbn = isbn
+            self.isbn_13 = '978'+isbn
+            self.isbn = self.isbn_13
+        elif len(isbn) == 9:
+            self.isbn_10 = '0'+isbn
+            self.isbn_13 = '9780'+isbn
+            self.isbn = self.isbn_13
         else:
             self.isbn = isbn
         self.title = title

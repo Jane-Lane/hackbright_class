@@ -5,27 +5,36 @@ from api_attempts import raw_info
 import searching_dictionary
 PATH = "do_not_change/"
 
+def add_book(isbn):
+    if isbn != '':
+        book = get_info(isbn)
+        if book is not None:
+            print 'Adding to catalogue: %s by %s' %(book.title, book.author)
+            books.append(book)
+        else:
+            not_found.append(isbn)
+    
 def main():
-    file_check = raw_input("I expect a file called isbn.txt. Is there one? Y/N").strip().lower()
+    file_check = raw_input("I expect a file called isbn.txt. Is there one? Y/N: ").strip().lower()
     books = []
     isbn_list = []
+    not_found = []
     if file_check[0] == 'y':
         with open('isbn.txt', 'r') as file:
             for line in file:
                 isbn = line.strip()
                 isbn_list.append(isbn)
                 if isbn != '':
-                    book = get_info(isbn)
-                    if book is not None:
-                        print 'Adding to catalogue: %s by %s' %(book.title, book.author)
-                        books.append(book)
+                    add_book(isbn)
         with open('isbn.txt', 'w') as file: #clear ISBNs
-            file.write('')        
+            file.write('')       
     else:
         entry = raw_input("Press 1 to enter an ISBN, 2 to name another file, anything else to exit:")
         if entry == '1':
             isbn = raw_input("ISBN: ").strip()
-            isbn_list.append(isbn)
+            if isbn != '':
+                isbn_list.append(isbn)
+                add_book(isbn)
         elif entry == '2':
             file_name = raw_input("File name: ").strip()
             with open(file_name, 'r') as file:
@@ -33,10 +42,7 @@ def main():
                     isbn = line.strip()
                     isbn_list.append(isbn)
                     if isbn != '':
-                        book = get_info(isbn)
-                        if book is not None:
-                            print 'Adding to catalogue:', book
-                            books.append(book)
+                        add_book(isbn)
             with open(file_name, 'w') as file: #clear the file
                 file.write('')
 
@@ -46,9 +52,13 @@ def main():
             outfile.write('\n')
 
     used_ids = []
-    with open("id_index.txt", 'r') as file:
+    try:
+        file = open("id_index.txt", 'r')
         for line in file:
             used_ids.append(int(line))
+        file.close()
+    except IOError:
+        last = 0
 
     if len(used_ids) == 0:
         last = 0

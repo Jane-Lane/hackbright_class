@@ -1,10 +1,1 @@
-Fledgling:5 
-The Fifth Season:8 
-The Inconvenient Indian A Curious Account Of Native People In North America:6 
-Throne of the Crescent Moon:7 Fledgling:1 
-The Fifth Season:4 
-The Inconvenient Indian A Curious Account Of Native People In North America:2 
-Throne of the Crescent Moon:3 
-The Rithmatist:6 
-Once a hero:5 
-Glass Houses:0 
+{'The Inconvenient Indian A Curious Account Of Native People In North America': ['2'], 'The Fifth Season': ['4'], 'Once a hero': ['6'], 'Throne of the Crescent Moon': ['3'], 'The Rithmatist': ['7'], 'Glass Houses': ['5'], 'Fledgling': ['1']}

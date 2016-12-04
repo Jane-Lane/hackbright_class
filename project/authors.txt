@@ -1,11 +1,1 @@
-Saladin Ahmed:7 
-Octavia E. Butler:5 
-Thomas King:6 
-N. K. Jemisin:8 
-Saladin Ahmed:3 
-Octavia E. Butler:1 
-Thomas King:2 
-N. K. Jemisin:4 
-Brandon Sanderson:6 
-Elizabeth Moon:5 
-Laura J. Mixon:0 
+{'Brandon Sanderson': ['7'], 'Elizabeth Moon': ['6'], 'Thomas King': ['2'], 'Saladin Ahmed': ['3'], 'Octavia E. Butler': ['1'], 'Laura J. Mixon': ['5'], 'N. K. Jemisin': ['4']}

@@ -1,24 +1,41 @@
 from catalog_entry import *
 from api_attempts import get_info
 from api_attempts import raw_info
-
+import os
 import searching_dictionary
 PATH = "do_not_change/"
+
+if not os.path.isdir(PATH[0:-1]):
+    os.makedirs(PATH[0:-1])
+books = []
+isbn_list = []
+not_found = []
 
 def add_book(isbn):
     if isbn != '':
         book = get_info(isbn)
         if book is not None:
-            print 'Adding to catalogue: %s by %s' %(book.title, book.author)
+            print 'Adding to catalogue: %s by %s' %(book.title[0:30], book.author)
             books.append(book)
+            return book
         else:
             not_found.append(isbn)
+
+def remove_book(id_number):
+    try:
+        os.remove(PATH+id_number+'.txt')
+        print "Record %s.txt removed. You should remove the number %s from %sid_index.txt, or run the update script."%(id_number, id_number, PATH)
+    except OSError:
+        pass
     
-def main():
-    file_check = raw_input("I expect a file called isbn.txt. Is there one? Y/N: ").strip().lower()
-    books = []
-    isbn_list = []
-    not_found = []
+def main(extra_books = None):
+    print "By default, I read a list of ISBNs off of isbn.txt, one per line."
+    file_check = raw_input("Would you like to read a list of ISBNs from isbn.txt? Y/N: ").strip().lower()
+    global books
+    if extra_books is not None:
+        books.extend(extra_books)
+    global isbn_list
+    global not_found
     if file_check[0] == 'y':
         with open('isbn.txt', 'r') as file:
             for line in file:
@@ -31,10 +48,16 @@ def main():
     else:
         entry = raw_input("Press 1 to enter an ISBN, 2 to name another file, anything else to exit:")
         if entry == '1':
-            isbn = raw_input("ISBN: ").strip()
-            if isbn != '':
-                isbn_list.append(isbn)
-                add_book(isbn)
+            while(True):
+                print "Enter an ISBN number, or 'exit' to exit."
+                isbn = raw_input("ISBN: ").strip().lower()
+                if isbn != '' and isbn != 'exit':
+                    isbn_list.append(isbn)
+                    add_book(isbn)
+                elif isbn == 'exit':
+                    break
+                else:
+                    print "No ISBN entered, please try again."
         elif entry == '2':
             file_name = raw_input("File name: ").strip()
             with open(file_name, 'r') as file:
@@ -50,13 +73,17 @@ def main():
         for isbn in isbn_list:
             outfile.write(strip_isbn(isbn))
             outfile.write('\n')
+    with open("not_found_isbns.txt", 'a') as outfile:
+        for isbn in not_found:
+            outfile.write(strip_isbn(isbn))
+            outfile.write('\n')
 
     used_ids = []
     try:
-        file = open("id_index.txt", 'r')
-        for line in file:
-            used_ids.append(int(line))
-        file.close()
+        with open(PATH+"id_index.txt", 'r') as file:
+            contents = file.read()
+        if len(contents) > 0:
+            used_ids = eval(contents)
     except IOError:
         last = 0
 
@@ -76,10 +103,8 @@ def main():
     if len(all_ids) > 0:
         all_ids.sort()
 
-    with open("id_index.txt", 'w') as file:
-        for num in all_ids:
-            file.write(str(num))
-            file.write("\n")
+    with open(PATH+"id_index.txt", 'w') as file:
+        file.write(str(all_ids))
 
     keywords = {}
     titles = {}

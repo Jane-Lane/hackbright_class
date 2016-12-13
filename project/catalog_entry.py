@@ -34,10 +34,11 @@ class Record(object):
 Title: %s
 Author: %s
 Publisher: %s
-ISBN 10: %s
-ISBN 13: %s
+ISBN: %s
+Library of Congress catalog number: %s
 Library ID: %s
-'''%(self.title, self.author, self.publisher, self.isbn_10, self.isbn_13, self.library_id)
+Keywords: %s
+'''%(self.title, self.author, self.publisher, self.isbn, self.lccn, self.library_id, ', '.join(self.keywords))
         return s
 
     def __eq__(self, other):
@@ -45,31 +46,36 @@ Library ID: %s
             return True
         else:
             return False
-
-class CatalogEntry(Record):
-    def __init__(self, isbn, copies = 1, title='', author=''):
-        Record.__init__(self, '', isbn, title, author)
-        self.copies = copies
-        
-    def __repr__(self): #Method of displaying/printing/stringifying an object.
-        s = '''
-Title: %s
-Author: %s
-Publisher: %s
-ISBN: %s
-Copies: %i
-''' %(self.title, self.author, self.publisher, self.isbn, self.copies)
-        return s
-
-    def __eq__(self, other): #The thing that says if two catalog entries are the same
-        if self.title != other.title:
-            return False
-        elif self.author != other.author:
-            return False
-        elif self.isbn_10 != '' and other.isbn_10 != '' and self.isbn_10 != other.isbn_10:
-            return False
-        elif self.isbn_13 != '' and other.isbn_13 != '' and self.isbn_13 != other.isbn_13:
-            return False
+    def fix_isbn(self):
+        if len(self.isbn) == 13:
+            self.isbn_13 = self.isbn
+        elif len(self.isbn) == 10:
+            self.isbn_10 = self.isbn
+            self.isbn_13 = '978'+self.isbn_10
+            self.isbn = self.isbn_13
+        elif len(self.isbn) == 9:
+            self.isbn_10 = '0'+self.isbn
+            self.isbn_13 = '978'+self.isbn_10
+            self.isbn = self.isbn_13
         else:
-            return True
+            print "Bad ISBN: %s for library ID %s" % self.isbn, self.library_id
 
+def record_from_string(record_string):
+    lines = record_string.split('\n')
+    ret = Record('')
+    for line in lines:
+        line = line.strip()
+        if line[0:6].lower() == 'title:':
+            ret.title = line[6:].strip()
+        if line[0:7].lower() == 'author:':
+            ret.author = line[7:].strip()
+        if line[0:10].lower() == 'publisher:':
+            ret.publisher = line[10:].strip()
+        if line[0:5].upper() == 'ISBN:':
+            ret.isbn = strip_isbn(line[5:])
+            ret.fix_isbn()
+        if line[0:9].lower() == 'keywords:':
+            ret.keywords = line[9:].split(', ')
+        if line[0:11].lower() == 'library id:':
+            ret.library_id = line[11:].strip()
+    return ret

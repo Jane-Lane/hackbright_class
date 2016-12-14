@@ -6,9 +6,10 @@ from catalog_entry import Record
 
 record_list = []
 manual_books = []
+to_remove = []
 titles = searching_dictionary.read_titles()
-
 authors = searching_dictionary.read_authors()
+keywords = searching_dictionary.read_keywords()
 
 def make_list():
     global record_list
@@ -22,6 +23,20 @@ Enter 'title' to search for records by title, and 'ID' to search for records by 
             results = display_by_title(start_string, stop_string)
         else:
             results = display_by_title('!', None)
+    elif choice == 'id':
+        print "Write 'from [ID] to [ID]' to get all IDs in that range, or write a list of IDs separated by commas and/or spaces."
+        input_string = raw_input("IDs to manage: ").strip().lower()
+        if input_string[0] == 'f':
+            four_things = input_string.split()
+            start = int(four_things[1])
+            stop = int(four_things[3])+1
+            results = map(str, list(range(start, stop)))
+        else:
+            spaced_string = input_string.replace(',', ' ')
+            results = spaced_string.split()
+    else:
+        results = []
+        return None
     print "Which of these would you like to manage?"
     requests = raw_input("Type 'all', 'none', or a list of library IDs separated by commas or spaces: ").strip().lower()
     if requests == 'all':
@@ -34,8 +49,9 @@ Enter 'title' to search for records by title, and 'ID' to search for records by 
 
 def manage_book(id_number):
     print "Managing library ID %s" %id_number
-    choice = raw_input("To remove this book, type 'remove' or 'r'. To edit, type 'edit'. To add another copy, type 'copy'.").strip().lower()
-    if choice == 'remove':
+    choice = raw_input("To remove this book, type 'remove' or 'r'. To edit, type 'edit'. To add another copy, type 'copy'. ").strip().lower()
+    if choice == 'remove' or choice == 'r':
+        to_remove.append(id_number) #Will run after all books are managed
         basic_entries.remove_book(id_number)
     elif choice == 'edit':
         pass
@@ -88,6 +104,7 @@ def display_by_id(start_index, stop_index):
 
 def manual_entry(isbn):
     global manual_books
+    print "Manual entry for ISBN %s" % isbn
     title = raw_input("Enter title: ").strip()
     author = raw_input("Enter author: ").strip()
     publisher = raw_input("Enter publisher: ").strip()
@@ -116,8 +133,8 @@ Type "3", "add books", or "ISBN" to add a list of books to the catalogue by ISBN
 Type "4" or "exit" to exit the program.
 '''
 
-
 def main():
+    global to_remove
     print "Welcome to Elizabeth's Library Catalog Software!"
     display_menu()
     while(True):
@@ -130,19 +147,25 @@ def main():
             make_list()
             while len(record_list) > 0:
                 manage_book(record_list.pop())
+            searching_dictionary.remove_books(to_remove) #after managing has been done
             display_menu()
         elif choice == '2' or choice == 'update':
             inspect.main()
         elif choice == '3' or choice == 'add books' or choice == 'isbn':
             basic_entries.main()
             with open('not_found_isbns.txt', 'r') as file:
-                for line in file:
-                    isbn = basic_entries.strip_isbn(line)
-                    manual_entry(isbn)
-                basic_entries.main(manual_books)
-            
-        else:
-            pass
+                how_many = len(file.readlines())
+                if now_many > 0:
+                    print "There are %s ISBNs that could not be found automatically." % how_many
+                    choice2  = raw_input("Would you like to enter their information manually? Y/N: ").strip().lower()
+                    if choice2 == 'y':
+                        file.seek(0)
+                        for line in file:
+                            isbn = basic_entries.strip_isbn(line)
+                            manual_entry(isbn)
+                        basic_entries.main(manual_books)
+        else: #wrong choices
+            display_menu()
 
 if __name__ == "__main__":
     main()

@@ -24,7 +24,7 @@ def add_book(isbn):
 def remove_book(id_number):
     try:
         os.remove(PATH+id_number+'.txt')
-        print "Record %s.txt removed. You should remove the number %s from %sid_index.txt, or run the update script."%(id_number, id_number, PATH)
+        print "Record %s.txt removed. Remember to run the update script when you're done."%(id_number)
     except OSError:
         pass
     

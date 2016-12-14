@@ -1,11 +1,12 @@
 from basic_entries import PATH
-from os import walk
+import os
 import searching_dictionary
+from catalog_entry import *
 
 ids = []
 
 def make_id_list():
-    all_files = next(walk(PATH))[2]
+    all_files = next(os.walk(PATH))[2]
     existing_records = [x.strip('.txt') for x in all_files if x[0] in '0123456789']
     return existing_records
 
@@ -24,26 +25,56 @@ except IOError:
         file.write(str(all_records))
 
 
-def update_search_terms():
+def update_search_terms(ids):
     keywords = searching_dictionary.read_keywords()
     authors = searching_dictionary.read_authors()
     titles = searching_dictionary.read_titles()
     for key in keywords:
-        keywords[key] = [x for x in keywords[key] if x in ids]
+        keywords[key] = list(set([x for x in keywords[key] if x in ids]))
     searching_dictionary.update_keywords(keywords)
     for a in authors:
-        authors[a] = [x for x in authors[a] if x in ids]
+        authors[a] = list(set([x for x in authors[a] if x in ids]))
     searching_dictionary.update_authors(authors)
     for t in titles:
-        titles[t] = [x for x in titles[t] if x in ids]
+        titles[t] = list(set([x for x in titles[t] if x in ids]))
     searching_dictionary.update_titles(titles)
+
+def fix_search_files():
+    global ids
+    keywords = {}
+    titles = {}
+    authors = {}
+    for library_id in ids:
+        with open(PATH+library_id+".txt", 'r') as file:
+            contents = file.read()
+            if len(contents) > 0:
+                book = record_from_string(contents)
+                author = book.author
+                title = book.title
+                keys = book.keywords
+                if author not in authors:
+                    authors[author] = []
+                authors[author].append(library_id)
+                if title not in titles:
+                    titles[title] = []
+                titles[title].append(library_id)
+                for word in keys:
+                    if word not in keywords:
+                        keywords[word] = []
+                    keywords[word].append(library_id)
+            else:
+                print "Error: record %s empty. Please remove manually or fix it." % library_id
+    searching_dictionary.add_authors(authors)
+    searching_dictionary.add_titles(titles)
+    searching_dictionary.add_keywords(keywords)
 
 def main():
     global ids
     real_ids = make_id_list()
     false_ids = [x for x in ids if x not in real_ids]
     unlisted_ids = [x for x in real_ids if x not in ids]
-    print "Bad IDs found: %s" % ', '.join(false_ids)
+    #print "Bad IDs found: %s" % ', '.join(false_ids)
+    print "Bad ID list:", false_ids
     print "%i total records found" % len(real_ids)
     print "Unlisted records: %s" % ', '.join(unlisted_ids)
     if len(false_ids) > 0:
@@ -55,7 +86,8 @@ def main():
             ids.sort()
     with open(PATH+"id_index.txt", 'w') as file:
         file.write(str(ids))      
-    update_search_terms()
+    update_search_terms(ids)
+    fix_search_files()
 
 if __name__ == "__main__":
     main()

@@ -12,10 +12,15 @@ def read_keywords():
     except IOError:
         print "No file keywords.txt found, assuming keywords empty"
         keywords = {}
+    empty_keys = [key for key in keywords if keywords[key] != None and len(keywords[key]) == 0]
+    for key in empty_keys:
+        del keywords[key]
     return keywords
 
 def update_keywords(keywords):
     if len(keywords) != 0:
+        for key in keywords:
+            keywords[key] = list(set(keywords[key]))
         file = open("keywords.txt", 'w')
         file.write(str(keywords))
         file.close()
@@ -30,6 +35,25 @@ def add_keywords(more_keywords):
     update_keywords(keywords)
     return keywords
 
+def remove_keywords(bad_keywords):
+    keywords = read_keywords()
+    bad_ids = []
+    for key in bad_keywords:
+        if key in keywords:
+            if len(keywords[key]) > 0:
+                print "Books %s use this keyword." % ', '.join(keywords[key])
+                choice = raw_input("Would you like to remove these keywords anyway? Y/N: ").strip().lower()
+                if choice == 'y':
+                    bad_ids.extend(keywords[key])
+                    del keywords[key]
+                else:
+                    print "Keyword %s not removed." % key
+            else:
+                del keywords[key]
+                print "Keyword %s removed." % key
+    update_keywords(keywords)
+    return list(set(bad_ids))
+
 def read_authors():
     try:
         file = open("authors.txt", 'r')
@@ -42,10 +66,15 @@ def read_authors():
     except IOError:
         print "No file authors.txt found, assuming authors empty"
         authors = {}
+    empty_keys = [key for key in authors if authors[key] != None and len(authors[key]) == 0]
+    for key in empty_keys:
+        del authors[key]
     return authors
 
 def update_authors(authors):
     if len(authors) != 0:
+        for a in authors:
+            authors[a] = list(set(authors[a])) #no repetition!
         file = open("authors.txt", 'w')
         file.write(str(authors))
         file.close()
@@ -60,6 +89,25 @@ def add_authors(more_authors):
     update_authors(authors)
     return authors
 
+def remove_authors(bad_authors):
+    authors = read_authors()
+    bad_ids = []
+    for a in bad_authors:
+        if a in authors:
+            if len(authors[a]) > 0:
+                print "Books %s are by this author." % ', '.join(authors[a])
+                choice = raw_input("Would you like to remove this author anyway? Y/N: ").strip().lower()
+                if choice == 'y':
+                    bad_ids.extend(authors[a])
+                    del authors[a]
+                else:
+                    print "Author %s not removed." % a
+            else:
+                del authors[a]
+                print "Author %s removed." % a
+    update_authors(authors)
+    return list(set(bad_ids))
+
 def read_titles():
     try:
         file = open("titles.txt", 'r')
@@ -72,10 +120,15 @@ def read_titles():
     except IOError:
         print "No file titles.txt found, assuming titles empty"
         titles = {}
+    empty_keys = [key for key in titles if titles[key] != None and len(titles[key]) == 0]
+    for key in empty_keys:
+        del titles[key]
     return titles
 
 def update_titles(titles):
     if len(titles) != 0:
+        for t in titles:
+            titles[t] = list(set(titles[t]))
         file = open("titles.txt", 'w')
         file.write(str(titles))
         file.close()
@@ -90,6 +143,45 @@ def add_titles(more_titles):
     update_titles(titles)
     return titles
 
+def remove_titles(bad_titles):
+    titles = read_titles()
+    bad_ids = []
+    for t in bad_titles:
+        if t in titles:
+            if len(titles[t]) > 0:
+                print "Books %s have this title." % ', '.join(titles[t])
+                choice = raw_input("Would you like to remove this title anyway? Y/N: ").strip().lower()
+                if choice == 'y':
+                    bad_ids.extend(titles[t])
+                    del titles[t]
+                else:
+                    print "Title %s not removed." % t
+            else:
+                del titles[t]
+                print "Title %s removed." % t
+    update_titles(titles)
+    return list(set(bad_ids))
+
+def remove_id(dictionary, book_id):
+    for key in dictionary:
+        while book_id in dictionary[key]:
+            dictionary[key].remove(book_id)
+        if len(dictionary[key])==0:
+            del dictionary[key]
+        return dictionary
+
+def remove_books(ids):
+    authors = read_authors()
+    titles = read_titles()
+    keywords = read_keywords()
+    for library_id in ids:
+        remove_id(authors, library_id)
+        remove_id(titles, library_id)
+        remove_id(keywords, library_id)
+    update_titles(titles)
+    update_authors(authors)
+    update_keywords(keywords)
+
 def main(): #Files will exist after the first time this is run.
     titles = read_titles()
     authors = read_authors()
@@ -100,127 +192,3 @@ def main(): #Files will exist after the first time this is run.
 
 if __name__ == "__main__":
     main()
-
-
-
-##    with open("keywords.txt", 'r') as file:
-##        for line in file:
-##            line = line.strip()
-##            if len(line) > 0:
-##                line = line.split(":")
-##                key = line[0]
-##                if key in keywords:
-##                    print "Error: repeated keyword %s, merging" % key
-##                else:
-##                    keywords[key] = []
-##                try:
-##                    values = line[1].split()
-##                    keywords[key].extend(values)
-##                except IndexError:
-##                    print "No records for keyword %s, removing" % key
-##                if len(keywords[key])==0:
-##                    del keywords[key]
-##    return keywords
-
-    ##def read_authors():
-##    authors = {}
-##    with open("authors.txt", 'r') as file:
-##        for line in file:
-##            line = line.strip()
-##            if len(line) > 0:
-##                line = line.split(":")
-##                key = line[0]
-##                if key in authors:
-##                    print "Error: repeated author %s, merging" % key
-##                else:
-##                    authors[key] = []
-##                try:
-##                    values = line[1].split()
-##                    authors[key].extend(values)
-##                except IndexError:
-##                    print "No records for author %s, removing" % key
-##                if len(authors[key])==0:
-##                    del authors[key]
-##    return authors
-##
-##def read_titles():
-##    titles = {}
-##    with open("titles.txt", 'r') as file:
-##        for line in file:
-##            line = line.strip()
-##            if len(line) > 0:
-##                line = line.split(":")
-##                key = line[0]
-##                if key in titles:
-##                    print "Error: repeated title %s, merging" % key
-##                else:
-##                    titles[key] = []
-##                try:
-##                    values = line[1].split()
-##                    titles[key].extend(values)
-##                except IndexError:
-##                    print "No records for title %s, removing" % key
-##                if len(titles[key])==0:
-##                    del titles[key]
-##    return titles
-##
-##def update_titles(titles):
-##    with open("titles.txt", 'w') as file:
-##        for key in titles:
-##            file.write(key)
-##            file.write(":")
-##            for num in titles[key]:
-##                file.write(num)
-##                file.write(' ')
-##            file.write('\n')
-##
-##def add_titles(titles):
-##    with open("titles.txt", "a") as file:
-##        for key in titles:
-##            file.write(key)
-##            file.write(":")
-##            for num in titles[key]:
-##                file.write(num)
-##                file.write(' ')
-##            file.write('\n')
-##
-##def update_authors(authors):
-##    with open("authors.txt", 'w') as file:
-##        for key in authors:
-##            file.write(key)
-##            file.write(":")
-##            for num in authors[key]:
-##                file.write(num)
-##                file.write(' ')
-##            file.write('\n')
-##
-##def add_authors(authors):
-##    with open("authors.txt", 'a') as file:
-##        for key in authors:
-##            file.write(key)
-##            file.write(":")
-##            for num in authors[key]:
-##                file.write(num)
-##                file.write(' ')
-##            file.write('\n')
-##
-##def update_keywords(keywords):
-##    with open("keywords.txt", 'w') as file:
-##        for key in keywords:
-##            file.write(key)
-##            file.write(":")
-##            for num in keywords[key]:
-##                file.write(num)
-##                file.write(' ')
-##            file.write('\n')
-##
-##def add_keywords(keywords):
-##    with open("keywords.txt", 'a') as file:
-##        for key in keywords:
-##            file.write(key)
-##            file.write(":")
-##            for num in keywords[key]:
-##                file.write(num)
-##                file.write(' ')
-##            file.write('\n')
-

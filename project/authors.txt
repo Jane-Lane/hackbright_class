@@ -1,1 +1,1 @@
-{'Brandon Sanderson': ['6'], 'Elizabeth Moon': ['5'], 'Thomas King': ['2'], 'Jacqueline Carey': ['9', '7'], 'Saladin Ahmed': ['3'], 'Octavia E. Butler': ['1'], 'N. K. Jemisin': ['4']}
+{'': [11], 'Elizabeth Moon': [4], 'Jacqueline Carey': [0, 13, 7], 'Laura J. Mixon': [10], 'Tamora Pierce': [8], 'Octavia E. Butler': [1], 'Thomas King': [6], 'Saladin Ahmed': [2], 'Brandon Sanderson': [15], 'N. K. Jemisin': [12]}

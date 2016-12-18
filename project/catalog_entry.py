@@ -4,7 +4,7 @@ def strip_isbn(isbn): #takes out non-numeric characters
     return isbn
 
 class Record(object):
-    def __init__(self, library_id = '', ISBN = '', title='', author=''):
+    def __init__(self, library_id = None, ISBN = '', title='', author=''):
         self.library_id = library_id
         isbn = strip_isbn(ISBN)
         if len(isbn) == 13:
@@ -27,6 +27,9 @@ class Record(object):
         self.all_authors = []
         self.subjects = []
         self.keywords=[]
+        for key in self.keywords:
+            if key.strip() == '':
+                self.keywords.remove(key)
         self.all_publishers = []
         self.lccn = ''
     def __repr__(self):
@@ -38,7 +41,7 @@ ISBN: %s
 Library of Congress catalog number: %s
 Library ID: %s
 Keywords: %s
-'''%(self.title, self.author, self.publisher, self.isbn, self.lccn, self.library_id, ', '.join(self.keywords))
+'''%(self.title, self.author, self.publisher, self.isbn, self.lccn, str(self.library_id), ', '.join(self.keywords))
         return s
 
     def __eq__(self, other):
@@ -75,7 +78,11 @@ def record_from_string(record_string):
             ret.isbn = strip_isbn(line[5:])
             ret.fix_isbn()
         if line[0:9].lower() == 'keywords:':
-            ret.keywords = line[9:].split(', ')
+            ret.keywords = map(lambda x: x.strip(), line[9:].split(','))
         if line[0:11].lower() == 'library id:':
-            ret.library_id = line[11:].strip()
+            id_string = line[11:].strip()
+            if id_string == '':
+                ret.library_id = None
+            else:
+                ret.library_id = int(id_string)
     return ret

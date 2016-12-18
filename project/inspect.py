@@ -8,7 +8,7 @@ ids = []
 def make_id_list():
     all_files = next(os.walk(PATH))[2]
     existing_records = [x.strip('.txt') for x in all_files if x[0] in '0123456789']
-    return existing_records
+    return map(int, existing_records)
 
 try:
     with open(PATH+"id_index.txt", 'r') as file:
@@ -20,10 +20,9 @@ try:
                 ids = contents.split()
 except IOError:
     print "Missing id_index.txt file, I'll make one from existing records"
-    all_records = make_id_list()
+    all_records = sorted(make_id_list())
     with open(PATH+"id_index.txt", 'w') as file:
         file.write(str(all_records))
-
 
 def update_search_terms(ids):
     keywords = searching_dictionary.read_keywords()
@@ -41,11 +40,12 @@ def update_search_terms(ids):
 
 def fix_search_files():
     global ids
+    ids.extend(make_id_list())
     keywords = {}
     titles = {}
     authors = {}
     for library_id in ids:
-        with open(PATH+library_id+".txt", 'r') as file:
+        with open(PATH+str(library_id)+".txt", 'r') as file:
             contents = file.read()
             if len(contents) > 0:
                 book = record_from_string(contents)
@@ -73,10 +73,9 @@ def main():
     real_ids = make_id_list()
     false_ids = [x for x in ids if x not in real_ids]
     unlisted_ids = [x for x in real_ids if x not in ids]
-    #print "Bad IDs found: %s" % ', '.join(false_ids)
-    print "Bad ID list:", false_ids
+    print "Bad IDs found:", str(false_ids)[1:-1]
     print "%i total records found" % len(real_ids)
-    print "Unlisted records: %s" % ', '.join(unlisted_ids)
+    print "Unlisted records: %s" % str(unlisted_ids)[1:-1]
     if len(false_ids) > 0:
         if raw_input("Delete bad IDs? Y/N").strip().lower()== 'y':
             ids = real_ids
@@ -84,6 +83,9 @@ def main():
         else:
             ids = real_ids+false_ids
             ids.sort()
+    else:
+        ids = real_ids
+        ids.sort()
     with open(PATH+"id_index.txt", 'w') as file:
         file.write(str(ids))      
     update_search_terms(ids)

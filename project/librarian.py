@@ -1,8 +1,9 @@
 import inspect
 import basic_entries
+from basic_entries import PATH
 import searching_dictionary
 import search_ui
-from catalog_entry import Record
+from catalog_entry import *
 
 record_list = []
 manual_books = []
@@ -48,16 +49,65 @@ Enter 'title' to search for records by title, and 'ID' to search for records by 
         record_list.extend(requests.split())
 
 def manage_book(id_number):
-    print "Managing library ID %s" %id_number
+    id_number = int(id_number)
+    print "Managing library ID %i" %id_number
+    try:
+        file = open(PATH+str(id_number)+'.txt', 'r')
+        contents = file.read()
+        book = record_from_string(contents)
+        file.close()
+    except IOError:
+        print "Oops, no record found. Skipping this one."
+        return
+    print book
     choice = raw_input("To remove this book, type 'remove' or 'r'. To edit, type 'edit'. To add another copy, type 'copy'. ").strip().lower()
     if choice == 'remove' or choice == 'r':
         to_remove.append(id_number) #Will run after all books are managed
         basic_entries.remove_book(id_number)
     elif choice == 'edit':
-        pass
+        file = open(PATH+str(id_number)+'.txt', 'w')
+        while(True):
+            print "Press enter to stop editing."
+            attr = raw_input("Which would you like to edit? Title, ISBN, LCCN, author, publisher, or keywords: ").strip().lower()
+            if attr == 'title':
+                book.title = raw_input("New title: ").strip()
+                print book
+            elif attr == 'author':
+                book.author = raw_input("New author: ").strip()
+                print book
+            elif attr == 'isbn':
+                book.isbn = basic_entries.strip_isbn(raw_input("New ISBN: ").strip())
+                print book
+            elif attr == 'lccn':
+                book.lccn = raw_input("New LCCN: ").strip()
+                print book
+            elif attr == 'publisher':
+                book.publisher = raw_input("New publisher: ").strip()
+            elif attr == 'keywords':
+                new_keyword_string = raw_input("Enter additional keywords separated by commas: ").strip()
+                new_keywords = map(lambda x: x.strip(), new_keyword_string.split(','))
+                if len(book.keywords) > 0:
+                    while '' in book.keywords:
+                        book.keywords.remove('')
+                    deletion = raw_input("Enter 'delete' to delete old keywords, or a specific keyword to delete it: ").strip()
+                    if deletion.lower() == 'delete':
+                        book.keywords = new_keywords
+                    elif deletion != '' and deletion in book.keywords:
+                        book.keywords.remove(deletion)
+                        book.keywords.extend(new_keywords)
+                    else:
+                        book.keywords.extend(new_keywords)
+                else:
+                    book.keywords = new_keywords
+                print book
+            elif attr == 'library_id':
+                print "To change the library ID, please copy the book to a new ID and remove this copy."
+            else:
+                break
+        file.write(str(book))
+        file.close()
     elif choice == 'copy':
         pass
-        
 
 def display_by_title(start_string, stop_string): #inclusive on both ends
     start_string = start_string.lower()
@@ -80,15 +130,16 @@ def display_by_title(start_string, stop_string): #inclusive on both ends
     results = []
     for title in selected:
         results.extend(titles[title])
-        print title[0:30], ": Library ID", ', '.join(x for x in titles[title])
+        print title[0:30], ": Library ID", str(titles[title])[1:-1]
     return results
 
 def display_by_id(start_index, stop_index):
     results = []
     for id_number in range(start_index, stop_index + 1):
         try:
-            display(str(id_number))
-            results.append(str(id_number))
+            with open(PATH+str(id_number)+'.txt') as file:
+                book = record_from_string(file.read())
+            results.append(book.title())
         except IOError:
             error_count += 1
             print "No record found for Library ID %s" %id_number
@@ -155,7 +206,7 @@ def main():
             basic_entries.main()
             with open('not_found_isbns.txt', 'r') as file:
                 how_many = len(file.readlines())
-                if now_many > 0:
+                if how_many > 0:
                     print "There are %s ISBNs that could not be found automatically." % how_many
                     choice2  = raw_input("Would you like to enter their information manually? Y/N: ").strip().lower()
                     if choice2 == 'y':

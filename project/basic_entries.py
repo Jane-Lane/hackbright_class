@@ -23,7 +23,7 @@ def add_book(isbn):
 
 def remove_book(id_number):
     try:
-        os.remove(PATH+id_number+'.txt')
+        os.remove(PATH+str(id_number)+'.txt')
         print "Record %s.txt removed. Remember to run the update script when you're done."%(id_number)
     except OSError:
         pass
@@ -84,6 +84,7 @@ def main(extra_books = None):
             contents = file.read()
         if len(contents) > 0:
             used_ids = eval(contents)
+            used_ids = map(int, used_ids)
     except IOError:
         last = 0
 
@@ -131,7 +132,7 @@ def main(extra_books = None):
     searching_dictionary.add_keywords(keywords)
 
     for book in books:
-        file_name = PATH + book.library_id+".txt"
+        file_name = PATH + str(book.library_id)+".txt"
         with open(file_name, 'w') as file:
             file.write(str(book))
 
